@@ -1,0 +1,82 @@
+---
+title: "EDA-challenge.qmd"
+format: html
+editor: visual
+---
+
+Responses to Exercise 3 questions :)
+
+Question 1: BSD variable for Body Size Dimorphism
+
+``` R
+library(tidyverse)
+require(tidyverse)
+f <- file.choose("C:\\Users\\kmr4774\\Downloads\\data-wrangling.csv”)
+df <- read_csv(file = f, col_names = TRUE)
+bsd <- df$Body_mass_male_mean / df$Body_mass_female_mean
+bsd
+```
+
+Question 2: Calculating Sex Ratio
+
+``` R
+df$sex_ratio <- df$AdultMales / df$Adultfemale
+sex_ratio <- df$sex_ratio
+sex_ratio
+```
+
+Question 3: Defensability Index (DI)
+
+``` R
+DI <- df$DayLength_km/(2 * sqrt(df$HomeRange_km2 / pi))
+DI
+```
+
+Questions 4 & 5: Plotting the relationship between day range length (y axis) and time spent moving (x axis), for these primate species *overall* and *by family.* Repeat and look at the relationship between day range length (y axis) and group size (x axis), overall and by family.
+
+``` R
+p <- ggplot(data = df, aes(x = Move, y = DayLength_km)) + geom_print()
+p
+p <- ggplot(data = df, aes(x = Move, y = DayLength_km)) + geom_point() + facet_wrap( ~Family)
+p
+```
+
+``` R
+p <- ggplot(data = df, aes(x = MeanGroupSize, y = DayLength_km)) + geom_point()
+p
+p <- ggplot(data = df, aes(x = MeanGroupSize, y = DayLength_km)) + geom_point() + facet_wrap( ~Family)
+p
+```
+
+Question 6: Plot the relationship between canine size dimorphism (y axis) and body size dimorphism (x axis) *overall* and *by family*
+
+``` R
+p <- ggplot(data = df, aes(x = bsd, y = Canine_Dimorphism)) + geom_point()
+p
+```
+
+Question 7: Create the diet_strategy variable where "frugivore" is classified as \>50% fruit of diet, "folivore" is classified as \>50% leaves of diet, and "omnivore" if diet data if diet data available but falls into neither category. Turn these results into a box plots of group size for species with different diet strategies.
+
+``` R
+df <- df |> mutate("diet_strategy" = case_when(Fruit >= 50 ~ "frugivore", Leaves >= 50 ~ "folivore", Fruit < 50 & Leaves < 50 ~ "omnivore", TRUE ~ NA))
+p <- ggplot(data = filter(df, !is.na(df$diet_strategy)), aes(x = diet_strategy, y = MeanGroupSize)) + geom_boxplot()
+p
+```
+
+Question 8: In one line of code: Add a variable, **Binomial** to the data frame **d**, which is a concatenation of the **Genus** and **Species** variables…
+
+-   Trim the data frame to only include the variables **Binomial**, **Family**, **Brain_size_species_mean**, and **Body_mass_male_mean**…
+
+-   Group these variables by **Family**…
+
+-   Calculate the average value for **Brain_Size_Species_Mean** and **Body_mass_male_mean** per **Family** (remember, you may need to specify `na.rm = TRUE`)…
+
+-   Arrange by *increasing* average brain size…
+
+-   And *print* the output to the console
+
+``` R
+df <- df |> mutate(Binomial = paste0(Genus, "", Species)) |> select(Binomial, Family, Brain_Size_Species_Mean, Body_mass_male_mean) |> group_by(Family) |> summarise(meanBrainSize = mean(df$Brain_Size_Species_Mean, na.rm = TRUE), meanMaleBodySize = mean(df$Body_mass_male_mean, na.rm = TRUE)) |> arrange(meanBrainSize) |> print()
+```
+
+Ta da!
